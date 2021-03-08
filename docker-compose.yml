@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  app:
+    container_name: ${APP_CONTAINER}
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    image: ${APP_IMAGE}
+    tty: true
+    volumes:
+      - ${DIR_APP}:/var/www
+    networks:
+      - app-network
+
+  webserver:
+    container_name: nginx
+    image: nginx:latest
+    ports:
+      - ${APP_PORT}:80
+      - ${APP_SECURE_PORT}:443
+    depends_on:
+      - app
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
